@@ -12,6 +12,7 @@
     "@astrojs/preact": "^4.1.0",
     "@astrojs/rss": "^4.0.12",
     "astro": "^5.11.0",
+    "cropperjs": "^2.0.0",
     "preact": "^10.26.9"
   }
 }
