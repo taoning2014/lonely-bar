@@ -1,5 +1,7 @@
 # Astro Starter Kit: Minimal
 
+Visit the demo app: https://glowing-chaja-bca8b9.netlify.app/
+
 ```sh
 npm create astro@latest -- --template minimal
 ```
