@@ -2,37 +2,79 @@
 import "cropperjs/dist/cropper.css";
 ---
 
+<h2>Image Cropper</h2>
+
+<input type="file" accept="image/*" id="fileInput" />
+<br />
+
 <div class="cropper-container">
-    <img id="image" src="/images/sample.png" alt="Picture" />
+    <img id="image" alt="Picture" />
 </div>
 
 <script>
     import Cropper from "cropperjs";
 
+    const fileInput = document.getElementById("fileInput");
     const image = document.getElementById("image");
-    if (image instanceof HTMLImageElement) {
-        const cropper = new Cropper(image, {
-            aspectRatio: 16 / 9,
-            crop(event) {
-                console.log(event.detail.x);
-                console.log(event.detail.y);
-                console.log(event.detail.width);
-                console.log(event.detail.height);
-                console.log(event.detail.rotate);
-                console.log(event.detail.scaleX);
-                console.log(event.detail.scaleY);
-            },
-        });
-        console.log(cropper);
+    if (
+        !(fileInput instanceof HTMLInputElement) ||
+        !(image instanceof HTMLImageElement)
+    ) {
+        throw new Error("File input element or image element is not found");
     }
+
+    fileInput.addEventListener("change", (event) => {
+        if (
+            !(
+                event.target instanceof HTMLInputElement &&
+                event.target.files &&
+                event.target.files[0] instanceof File
+            )
+        ) {
+            console.error("No file selected or file is not valid");
+            return;
+        }
+
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            if (
+                !(
+                    e.target &&
+                    e.target.result &&
+                    typeof e.target.result === "string"
+                )
+            ) {
+                console.error("FileReader did not return a valid result");
+                return;
+            }
+
+            image.src = e.target.result;
+            image.style.display = "block";
+            const cropper = new Cropper(image, {
+                aspectRatio: 16 / 9,
+                crop(event) {
+                    console.log(event.detail.x);
+                    console.log(event.detail.y);
+                    console.log(event.detail.width);
+                    console.log(event.detail.height);
+                    console.log(event.detail.rotate);
+                    console.log(event.detail.scaleX);
+                    console.log(event.detail.scaleY);
+                },
+            });
+            console.log(cropper);
+        };
+        reader.readAsDataURL(file);
+    });
 </script>
 
 <style lang="scss" scoped>
-    /* Make sure the size of the image fits perfectly into the container */
-    img {
-        display: block;
-
-        /* This rule is very important, please don't ignore this */
+    input[type="file"] {
+        margin-bottom: 1rem;
+    }
+    #image {
+        display: none;
         max-width: 100%;
     }
 </style>
