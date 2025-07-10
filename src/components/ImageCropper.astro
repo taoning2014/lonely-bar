@@ -1,31 +1,38 @@
 ---
+import "cropperjs/dist/cropper.css";
 ---
 
-<div class="cropper-container"></div>
+<div class="cropper-container">
+    <img id="image" src="/images/sample.png" alt="Picture" />
+</div>
 
 <script>
     import Cropper from "cropperjs";
-    const IMAGE_URL = "/images/sample.png";
 
-    const image = new Image();
-    image.src = IMAGE_URL;
-    image.alt = "Picture";
-
-    const cropper = new Cropper(image, {
-        container: ".cropper-container",
-    });
-
-    console.log(cropper);
+    const image = document.getElementById("image");
+    if (image instanceof HTMLImageElement) {
+        const cropper = new Cropper(image, {
+            aspectRatio: 16 / 9,
+            crop(event) {
+                console.log(event.detail.x);
+                console.log(event.detail.y);
+                console.log(event.detail.width);
+                console.log(event.detail.height);
+                console.log(event.detail.rotate);
+                console.log(event.detail.scaleX);
+                console.log(event.detail.scaleY);
+            },
+        });
+        console.log(cropper);
+    }
 </script>
 
 <style lang="scss" scoped>
-    $border-color: #2e2e32;
-    .cropper-container {
-        border: 1px solid $border-color;
-        border-radius: 0.375rem;
-        margin-bottom: 1rem;
-        margin-top: 1rem;
-        padding: 1.25rem 1.5rem;
-        height: 360px;
+    /* Make sure the size of the image fits perfectly into the container */
+    img {
+        display: block;
+
+        /* This rule is very important, please don't ignore this */
+        max-width: 100%;
     }
 </style>
