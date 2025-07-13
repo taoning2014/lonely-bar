@@ -46,9 +46,7 @@ export default {
 
     methods: {
         click({ target }) {
-            console.log('click event fired!', target);
             const action = target.getAttribute('data-action') || target.parentElement.getAttribute('data-action');
-            console.log('Action:', action);
             if (action) {
                 this.$emit('change', action);
             }

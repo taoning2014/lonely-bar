@@ -9,13 +9,9 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/preact": "^4.1.0",
-    "@astrojs/rss": "^4.0.12",
     "@astrojs/vue": "^5.1.0",
     "astro": "^5.11.0",
     "cropperjs": "^1.6.2",
-    "normalize": "^0.3.1",
-    "preact": "^10.26.9",
     "vue": "^3.5.17"
   },
   "devDependencies": {
