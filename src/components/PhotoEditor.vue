@@ -5,7 +5,7 @@
       <NavBar client:only="vue" :data="data" @change="change" />
     </header>
     <main class="main">
-      <h2 v-if="data.loaded" ref="editor" :data="data">Data loaded</h2>
+      <Editor client:only="vue" v-if="data.loaded" ref="editor" :data="data" />
       <Loader client:only="vue" v-else ref="loader" :data="data" />
     </main>
   </div>
@@ -14,11 +14,13 @@
 <script>
 import NavBar from './NavBar.vue';
 import Loader from './Loader.vue';
+import Editor from './Editor.vue';
 
 export default {
   components: {
     NavBar,
     Loader,
+    Editor,
   },
   data() {
     return {
@@ -36,7 +38,27 @@ export default {
 
   methods: {
     change(action) {
-      console.log('It works', action);
+      const { editor } = this.$refs;
+
+      switch (action) {
+        case 'crop':
+          editor.crop();
+          break;
+
+        case 'clear':
+          editor.clear();
+          break;
+
+        case 'restore':
+          editor.restore();
+          break;
+
+        case 'remove':
+          editor.reset();
+          break;
+
+        default:
+      }
     },
   },
 };
