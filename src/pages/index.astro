@@ -1,9 +1,8 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import ImageCropper from '../components/ImageCropper.astro';
-const pageTitle = "Home Page";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PhotoEditor from "../components/PhotoEditor.vue";
 ---
-<BaseLayout pageTitle={pageTitle}>
-  <h2>Image Cropper</h2>
-  <ImageCropper />
+
+<BaseLayout pageTitle="Photo Editor">
+    <PhotoEditor client:only="vue" />
 </BaseLayout>
