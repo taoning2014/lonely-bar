@@ -5,16 +5,20 @@
       <NavBar client:only="vue" :data="data" @change="change" />
     </header>
     <main class="main">
+      <h2 v-if="data.loaded" ref="editor" :data="data">Data loaded</h2>
+      <Loader client:only="vue" v-else ref="loader" :data="data" />
     </main>
   </div>
 </template>
 
 <script>
 import NavBar from './NavBar.vue';
+import Loader from './Loader.vue';
 
 export default {
   components: {
     NavBar,
+    Loader,
   },
   data() {
     return {
