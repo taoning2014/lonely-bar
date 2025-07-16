@@ -32,7 +32,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import Cropper from 'cropperjs';
 
 export default {

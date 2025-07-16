@@ -9,7 +9,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 const URL = window.URL || window.webkitURL;
 const REGEXP_MIME_TYPE_IMAGES = /^image\/\w+$/;
 const REGEXP_URLS = /^(?:https?|data):/;

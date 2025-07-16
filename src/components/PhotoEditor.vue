@@ -11,7 +11,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import NavBar from './NavBar.vue';
 import Loader from './Loader.vue';
 import Editor from './Editor.vue';
