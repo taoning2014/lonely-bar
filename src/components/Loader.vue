@@ -10,6 +10,12 @@
 </template>
 
 <script lang="ts">
+import type { ImageData } from '../types/index';
+
+interface LoaderData {
+    onPaste?: (event: ClipboardEvent) => void;
+}
+
 const URL = window.URL || window.webkitURL;
 const REGEXP_MIME_TYPE_IMAGES = /^image\/\w+$/;
 const REGEXP_URLS = /^(?:https?|data):/;
@@ -17,9 +23,21 @@ const REGEXP_URLS = /^(?:https?|data):/;
 export default {
     props: {
         data: {
-            type: Object,
-            default: () => ({}),
+            type: Object as () => ImageData,
+            default: () => ({
+                cropped: false,
+                cropping: false,
+                loaded: false,
+                name: '',
+                previousUrl: '',
+                type: '',
+                url: '',
+            }),
         },
+    },
+
+    data(): LoaderData {
+        return {};
     },
 
     mounted() {
@@ -31,10 +49,10 @@ export default {
     },
 
     methods: {
-        read(file, event) {
+        read(file: File, event?: DragEvent | ClipboardEvent): Promise<Partial<ImageData>> {
             return new Promise((resolve, reject) => {
                 if (!file) {
-                    resolve();
+                    resolve({});
                     return;
                 }
 
@@ -55,7 +73,8 @@ export default {
             });
         },
 
-        change({ target }) {
+        change(event: Event) {
+            const target = event.target as HTMLInputElement;
             const { files } = target;
 
             if (files && files.length > 0) {
@@ -69,12 +88,12 @@ export default {
             }
         },
 
-        dragover(e) {
+        dragover(e: DragEvent) {
             e.preventDefault();
         },
 
-        drop(e) {
-            const { files } = e.dataTransfer;
+        drop(e: DragEvent) {
+            const { files } = e.dataTransfer as DataTransfer;
 
             e.preventDefault();
 
@@ -87,8 +106,8 @@ export default {
             }
         },
 
-        paste(e) {
-            const { items } = e.clipboardData || window.clipboardData;
+        paste(e: ClipboardEvent) {
+            const { items } = e.clipboardData as DataTransfer;
 
             e.preventDefault();
 
@@ -96,6 +115,10 @@ export default {
                 new Promise((resolve, reject) => {
                     const item = Array.from(items).pop();
                     const error = new Error('Please paste an image file or URL.');
+                    if (!item) {
+                        reject(error);
+                        return;
+                    }
 
                     if (item.kind === 'file') {
                         resolve(item.getAsFile());
@@ -112,7 +135,8 @@ export default {
                                 xhr.ontimeout = alert;
 
                                 xhr.onprogress = () => {
-                                    if (!REGEXP_MIME_TYPE_IMAGES.test(xhr.getResponseHeader('content-type'))) {
+                                    const contentType = xhr.getResponseHeader('content-type');
+                                    if (contentType && !REGEXP_MIME_TYPE_IMAGES.test(contentType)) {
                                         xhr.abort();
                                     }
                                 };
@@ -132,18 +156,18 @@ export default {
                         reject(error);
                     }
                 })
-                    .then((blob) => this.read(blob, e).then((data) => {
+                    .then((blob) => this.read(blob as File, e).then((data) => {
                         this.update(data);
                     }))
                     .catch(this.alert);
             }
         },
 
-        alert(e) {
+        alert(e: Error) {
             window.alert(e && e.message ? e.message : e);
         },
 
-        update(data) {
+        update(data: Partial<ImageData>) {
             Object.assign(this.data, data);
         },
     },

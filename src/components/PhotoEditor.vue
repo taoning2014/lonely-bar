@@ -15,6 +15,7 @@
 import NavBar from './NavBar.vue';
 import Loader from './Loader.vue';
 import Editor from './Editor.vue';
+import type { ImageData, DataAction } from '../types/index';
 
 export default {
   components: {
@@ -22,7 +23,8 @@ export default {
     Loader,
     Editor,
   },
-  data() {
+
+  data(): { data: ImageData } {
     return {
       data: {
         cropped: false,
@@ -37,8 +39,11 @@ export default {
   },
 
   methods: {
-    change(action) {
-      const { editor } = this.$refs;
+    change(action: DataAction) {
+      const editor = this.$refs.editor as typeof Editor;
+      if (!editor) {
+        return;
+      }
 
       switch (action) {
         case 'crop':

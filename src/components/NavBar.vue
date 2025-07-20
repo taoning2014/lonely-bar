@@ -45,8 +45,13 @@ export default {
     },
 
     methods: {
-        click({ target }) {
-            const action = target.getAttribute('data-action') || target.parentElement.getAttribute('data-action');
+        click(event: MouseEvent) {
+            const target = event.target as HTMLElement;
+            if (!target) {
+                return;
+            }
+
+            const action = target.getAttribute('data-action') || target.parentElement?.getAttribute('data-action');
             if (action) {
                 this.$emit('change', action);
             }

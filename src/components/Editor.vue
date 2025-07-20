@@ -34,16 +34,33 @@
 
 <script lang="ts">
 import Cropper from 'cropperjs';
+import type { ImageData } from '../types/index';
+
+interface EditorData {
+    canvasData: Cropper.CanvasData | null;
+    cropBoxData: Cropper.CropBoxData | null;
+    croppedData: Cropper.Data | null;
+    cropper: Cropper | null;
+    onKeydown?: (e: KeyboardEvent) => void;
+}
 
 export default {
     props: {
         data: {
-            type: Object,
-            default: () => ({}),
+            type: Object as () => ImageData,
+            default: () => ({
+                cropped: false,
+                cropping: false,
+                loaded: false,
+                name: '',
+                previousUrl: '',
+                type: '',
+                url: '',
+            }),
         },
     },
 
-    data() {
+    data(): EditorData {
         return {
             canvasData: null,
             cropBoxData: null,
@@ -53,18 +70,30 @@ export default {
     },
 
     mounted() {
-        window.addEventListener('keydown', (this.onKeydown = this.keydown.bind(this)));
+        this.onKeydown = this.keydown.bind(this);
+        window.addEventListener('keydown', this.onKeydown);
     },
 
     beforeDestroy() {
-        window.removeEventListener('keydown', this.onKeydown);
+        if (this.onKeydown) {
+            window.removeEventListener('keydown', this.onKeydown);
+        }
         this.stop();
     },
 
     methods: {
-        click({ target }) {
+        click(event: MouseEvent) {
+            const target = event.target as HTMLElement;
+            if (!target) {
+                return;
+            }
+
             const { cropper } = this;
-            const action = target.getAttribute('data-action') || target.parentElement.getAttribute('data-action');
+            if (!cropper) {
+                return;
+            }
+
+            const action = target.getAttribute('data-action') || target.parentElement?.getAttribute('data-action');
 
             switch (action) {
                 case 'move':
@@ -100,7 +129,7 @@ export default {
             }
         },
 
-        keydown(e) {
+        keydown(e: KeyboardEvent) {
             switch (e.key) {
                 // Undo crop
                 case 'z':
@@ -204,8 +233,9 @@ export default {
             }
         },
 
-        dblclick(e) {
-            if (e.target.className.indexOf('cropper-face') >= 0) {
+        dblclick(e: MouseEvent) {
+            const target = e.target as HTMLElement;
+            if (target && target.className.indexOf('cropper-face') >= 0) {
                 e.preventDefault();
                 e.stopPropagation();
                 this.crop();
@@ -219,13 +249,18 @@ export default {
                 return;
             }
 
-            this.cropper = new Cropper(this.$refs.image, {
+            const imageRef = this.$refs.image as HTMLImageElement;
+            if (!imageRef) {
+                return;
+            }
+
+            this.cropper = new Cropper(imageRef, {
                 autoCrop: false,
                 dragMode: 'move',
                 background: false,
 
                 ready: () => {
-                    if (this.croppedData) {
+                    if (this.croppedData && this.cropper && this.canvasData && this.cropBoxData) {
                         this.cropper
                             .crop()
                             .setData(this.croppedData)
@@ -238,7 +273,7 @@ export default {
                     }
                 },
 
-                crop: ({ detail }) => {
+                crop: ({ detail }: Cropper.CropEvent) => {
                     if (detail.width > 0 && detail.height > 0 && !data.cropping) {
                         this.update({
                             cropping: true,
@@ -258,7 +293,7 @@ export default {
         crop() {
             const { cropper, data } = this;
 
-            if (data.cropping) {
+            if (data.cropping && cropper) {
                 this.croppedData = cropper.getData();
                 this.canvasData = cropper.getCanvasData();
                 this.cropBoxData = cropper.getCropBoxData();
@@ -275,7 +310,7 @@ export default {
         },
 
         clear() {
-            if (this.data.cropping) {
+            if (this.data.cropping && this.cropper) {
                 this.cropper.clear();
                 this.update({
                     cropping: false,
@@ -306,7 +341,7 @@ export default {
             });
         },
 
-        update(data) {
+        update(data: Partial<ImageData>) {
             Object.assign(this.data, data);
         },
     },
