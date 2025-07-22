@@ -28,19 +28,29 @@
 </template>
 
 <script lang="ts">
+import type { ImageData } from '../types/index';
+
 export default {
     emits: ['change'],
 
     props: {
         data: {
-            type: Object,
-            default: () => ({}),
+            type: Object as () => ImageData,
+            default: () => ({
+                cropped: false,
+                cropping: false,
+                loaded: false,
+                name: '',
+                previousUrl: '',
+                type: '',
+                url: '',
+            }),
         },
     },
 
     data() {
         return {
-            downloadable: typeof document.createElement('a').download !== 'undefined',
+            downloadable: document.createElement('a').download !== 'undefined',
         };
     },
 
