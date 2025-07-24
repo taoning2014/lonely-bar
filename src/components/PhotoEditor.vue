@@ -63,6 +63,7 @@ export default {
           break;
 
         default:
+          ((e: never) => { throw new Error(e) })(action);
       }
     },
   },
