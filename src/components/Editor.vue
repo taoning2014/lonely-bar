@@ -28,6 +28,13 @@
             <button class="toolbar__button" data-action="flip-vertical" title="Flip Vertical (V)">
                 <span class="fa fa-arrows-v" />
             </button>
+            <button class="toolbar__button" data-action="remove-horizontal-seam"
+                title="Remove Horizontal Seam (Ctrl+H)">
+                <span class="fa fa-magic" />
+            </button>
+            <button class="toolbar__button" data-action="remove-vertical-seam" title="Remove Vertical Seam (Ctrl+V)">
+                <span class="fa fa-magnet" />
+            </button>
         </div>
     </div>
 </template>
@@ -35,6 +42,7 @@
 <script lang="ts">
 import Cropper from 'cropperjs';
 import type { ImageData } from '../types/index';
+import { removeHorizontalSeam, removeVerticalSeam } from '../units/seam-carver/Index';
 
 interface EditorData {
     canvasData: Cropper.CanvasData | null;
@@ -123,6 +131,12 @@ export default {
 
                 case 'flip-vertical':
                     cropper.scaleY(-cropper.getData().scaleY || -1);
+                    break;
+                case 'remove-horizontal-seam':
+                    removeHorizontalSeam(cropper);
+                    break;
+                case 'remove-vertical-seam':
+                    removeVerticalSeam(cropper);
                     break;
 
                 default:
@@ -219,15 +233,28 @@ export default {
                     cropper.rotate(90);
                     break;
 
-                // Flip horizontal
                 case 'h':
-                    cropper.scaleX(-cropper.getData().scaleX || -1);
+                    if (e.ctrlKey) {
+                        // Remove horizontal seam
+                        e.preventDefault();
+                        removeHorizontalSeam(cropper);
+                    } else {
+                        // Flip horizontal
+                        cropper.scaleX(-cropper.getData().scaleX || -1);
+                    }
                     break;
 
-                // Flip vertical
                 case 'v':
-                    cropper.scaleY(-cropper.getData().scaleY || -1);
+                    if (e.ctrlKey) {
+                        // Remove vertical seam
+                        e.preventDefault();
+                        removeVerticalSeam(cropper);
+                    } else {
+                        // Flip vertical
+                        cropper.scaleY(-cropper.getData().scaleY || -1);
+                    }
                     break;
+
 
                 default:
             }
@@ -373,7 +400,7 @@ export default {
     left: 50%;
     margin-left: -8rem;
     position: absolute;
-    width: 16rem;
+    width: 20rem;
     z-index: 2015;
 }
 

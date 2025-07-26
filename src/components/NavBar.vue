@@ -21,7 +21,7 @@
 
             <a v-if="downloadable && data.loaded" class="nav__button nav__button--success" title="Download"
                 :download="data.name" :href="data.url"><span class="fa fa-download" /></a>
-            <a class="nav__button" href="https://github.com/fengyuanchen/photo-editor" title="View on GitHub"><span
+            <a class="nav__button" href="https://github.com/taoning2014/lonely-bar" title="View on GitHub"><span
                     class="fa fa-github" /></a>
         </nav>
     </div>
