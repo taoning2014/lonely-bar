@@ -24,3 +24,9 @@ body {
   white-space: nowrap;
   width: 1px;
 }
+
+img {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}

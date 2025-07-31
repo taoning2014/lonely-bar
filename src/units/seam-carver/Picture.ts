@@ -1,4 +1,4 @@
-import Color from './Color';
+import Color from './color';
 
 export default class Picture {
     private w!: number;

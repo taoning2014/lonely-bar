@@ -1,6 +1,6 @@
 import Cropper from 'cropperjs';
-import { SeamCarver } from './SeamCarver';
-import Picture from './Picture';
+import { SeamCarver } from './seam-carver';
+import Picture from './picture';
 
 export function removeHorizontalSeam(cropper: Cropper) {
     /**
@@ -14,14 +14,16 @@ export function removeHorizontalSeam(cropper: Cropper) {
      * 7. Refactor the common code into a utility function for both horizontal and vertical seam removal.
      */
     console.log('Removing horizontal seam');
-    const canvas = cropper.getCroppedCanvas();
+    const canvas = cropper.getCroppedCanvas({ imageSmoothingEnabled: false, });
     const picture = new Picture(canvas);
     const seamCarver = new SeamCarver(picture);
-    for (let y = 0; y < seamCarver.height; y++) {
-        for (let x = 0; x < seamCarver.width; x++) {
-            console.log(`Energy of pixel (${x}, ${y}): ${seamCarver.energy(x, y)}`);
-        }
-    }
+    // for (let y = 0; y < seamCarver.height; y++) {
+    //     for (let x = 0; x < seamCarver.width; x++) {
+    //         console.log(`Energy of pixel (${x}, ${y}): ${seamCarver.energy(x, y)}`);
+    //     }
+    // }
+    const horizontalSeam = seamCarver.findHorizontalSeam();
+    console.log('Horizontal seam:', horizontalSeam);
 }
 
 export function removeVerticalSeam(cropper: Cropper) {

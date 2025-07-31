@@ -42,7 +42,7 @@
 <script lang="ts">
 import Cropper from 'cropperjs';
 import type { ImageData } from '../types/index';
-import { removeHorizontalSeam, removeVerticalSeam } from '../units/seam-carver/Index';
+import { removeHorizontalSeam, removeVerticalSeam } from '../units/seam-carver';
 
 interface EditorData {
     canvasData: Cropper.CanvasData | null;
