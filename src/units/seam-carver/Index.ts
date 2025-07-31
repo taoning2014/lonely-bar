@@ -17,13 +17,9 @@ export function removeHorizontalSeam(cropper: Cropper) {
     const canvas = cropper.getCroppedCanvas({ imageSmoothingEnabled: false, });
     const picture = new Picture(canvas);
     const seamCarver = new SeamCarver(picture);
-    // for (let y = 0; y < seamCarver.height; y++) {
-    //     for (let x = 0; x < seamCarver.width; x++) {
-    //         console.log(`Energy of pixel (${x}, ${y}): ${seamCarver.energy(x, y)}`);
-    //     }
-    // }
-    const horizontalSeam = seamCarver.findHorizontalSeam();
-    console.log('Horizontal seam:', horizontalSeam);
+    seamCarver.debugPrintEnergyMatrix();
+    // const horizontalSeam = seamCarver.findHorizontalSeam();
+    // console.log('Horizontal seam:', horizontalSeam);
 }
 
 export function removeVerticalSeam(cropper: Cropper) {

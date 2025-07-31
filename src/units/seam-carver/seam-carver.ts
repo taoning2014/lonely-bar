@@ -111,4 +111,16 @@ export class SeamCarver {
     public removeVerticalSeam(seam: number[]): void {
 
     }
+
+    // debug function to print energy matrix
+    public debugPrintEnergyMatrix(): void {
+        console.log('Energy Matrix:');
+        for (let y = 0; y < this.height; y++) {
+            const row = [];
+            for (let x = 0; x < this.width; x++) {
+                row.push(this.energy(x, y).toFixed(2).padStart(8));
+            }
+            console.log(row.join(' '));
+        }
+    }
 }
