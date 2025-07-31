@@ -69,7 +69,7 @@ export class SeamCarver {
         }
 
         // Add the vertex between source and target
-        for (let col = 0; col < this.width; col++) {
+        for (let col = 0; col < this.width - 1; col++) {
             for (let row = 0; row < this.height; row++) {
                 if (row > 0) {
                     // Connect to the pixel above
@@ -84,7 +84,54 @@ export class SeamCarver {
             }
         }
 
+        // Debugging printout graph structure
+        // console.log(digraph);
+
         const result = new Array(this.width).fill(0);
+        let index = 0;
+        const shortestPath = new FindShortestPath(digraph, sourceIndex).pathTo(targetIndex);
+        for (const edge of shortestPath) {
+            if (edge.to === targetIndex) {
+                break;
+            }
+            // result[index++] = edge.to % this.width;
+            result[index++] = Math.floor(edge.to / this.width);
+        }
+
+        return result;
+    }
+
+    // sequence of indices for vertical seam
+    public findVerticalSeam(): number[] {
+        const digraph = new EdgeWeightedDigraph(this.width * this.height + 2);
+
+        const sourceIndex = this.width * this.height;
+        const targetIndex = sourceIndex + 1;
+
+        for (let col = 0; col < this.width; col++) {
+            // Add source to the first column (top row)
+            digraph.addEdge(new DirectedEdge(sourceIndex, col, 0));
+            // Add last column (bottom row) to the target
+            digraph.addEdge(new DirectedEdge((this.height - 1) * this.width + col, targetIndex, this.energy(col, this.height - 1)));
+        }
+
+        // Add the vertex between source and target
+        for (let row = 0; row < this.height - 1; row++) {
+            for (let col = 0; col < this.width; col++) {
+                if (col > 0) {
+                    // Connect to the pixel to the left in the next row
+                    digraph.addEdge(new DirectedEdge(row * this.width + col, (row + 1) * this.width + col - 1, this.energy(col, row)));
+                }
+                // Connect to the pixel directly below
+                digraph.addEdge(new DirectedEdge(row * this.width + col, (row + 1) * this.width + col, this.energy(col, row)));
+                if (col < this.width - 1) {
+                    // Connect to the pixel to the right in the next row
+                    digraph.addEdge(new DirectedEdge(row * this.width + col, (row + 1) * this.width + col + 1, this.energy(col, row)));
+                }
+            }
+        }
+
+        const result = new Array(this.height).fill(0);
         let index = 0;
         const shortestPath = new FindShortestPath(digraph, sourceIndex).pathTo(targetIndex);
         for (const edge of shortestPath) {
@@ -97,19 +144,22 @@ export class SeamCarver {
         return result;
     }
 
-    // sequence of indices for vertical seam
-    public findVerticalSeam(): number[] {
-        return [];
-    }
-
     // remove horizontal seam from current picture
     public removeHorizontalSeam(seam: number[]): void {
-
+        if (seam.length !== this.width) {
+            throw new Error('Invalid seam length for horizontal seam removal');
+        }
+        
+        this.#picture.removeHorizontalSeam(seam);
     }
 
     // remove vertical seam from current picture
     public removeVerticalSeam(seam: number[]): void {
-
+        if (seam.length !== this.height) {
+            throw new Error('Invalid seam length for vertical seam removal');
+        }
+        
+        this.#picture.removeVerticalSeam(seam);
     }
 
     // debug function to print energy matrix
