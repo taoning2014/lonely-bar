@@ -1,6 +1,6 @@
 import Cropper from 'cropperjs';
 import { SeamCarver } from './seam-carver';
-import Picture from './picture';
+import Picture from './picture/picture';
 
 export function removeHorizontalSeam(cropper: Cropper) {
     console.log('Removing horizontal seam');

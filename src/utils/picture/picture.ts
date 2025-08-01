@@ -1,4 +1,4 @@
-import Color from './color';
+import Color from '../picture/color';
 
 export default class Picture {
     private w!: number;
@@ -44,7 +44,7 @@ export default class Picture {
         const canvas = document.createElement('canvas');
         canvas.width = this.w;
         canvas.height = this.h;
-        
+
         const ctx = canvas.getContext('2d');
         if (!ctx) {
             throw new Error('Failed to get canvas context for copy');
@@ -66,7 +66,7 @@ export default class Picture {
         }
 
         ctx.putImageData(imageData, 0, 0);
-        
+
         // Create new Picture instance from canvas
         return new Picture(canvas);
     }
@@ -85,7 +85,7 @@ export default class Picture {
     // Remove horizontal seam from the picture
     removeHorizontalSeam(seam: number[]): void {
         console.time('Picture.removeHorizontalSeam');
-        
+
         if (seam.length !== this.w) {
             throw new Error('Invalid seam length for horizontal seam removal');
         }
@@ -94,12 +94,12 @@ export default class Picture {
         // Create new pixel array with reduced height
         const newPixArray: [number, number, number][][] = new Array(this.h - 1);
         console.timeEnd('Picture.removeHorizontalSeam.arrayCreation');
-        
+
         console.time('Picture.removeHorizontalSeam.pixelCopy');
         for (let x = 0; x < this.w; x++) {
             const seamRow = seam[x]; // Row to remove for this column
             let newY = 0;
-            
+
             for (let y = 0; y < this.h; y++) {
                 if (y !== seamRow) {
                     if (!newPixArray[newY]) {
@@ -116,14 +116,14 @@ export default class Picture {
         this.pixArray = newPixArray;
         this.h = this.h - 1;
         console.timeEnd('Picture.removeHorizontalSeam.assignment');
-        
+
         console.timeEnd('Picture.removeHorizontalSeam');
     }
 
     // Remove vertical seam from the picture
     removeVerticalSeam(seam: number[]): void {
         console.time('Picture.removeVerticalSeam');
-        
+
         if (seam.length !== this.h) {
             throw new Error('Invalid seam length for vertical seam removal');
         }
@@ -132,13 +132,13 @@ export default class Picture {
         // Create new pixel array with reduced width
         const newPixArray: [number, number, number][][] = new Array(this.h);
         console.timeEnd('Picture.removeVerticalSeam.arrayCreation');
-        
+
         console.time('Picture.removeVerticalSeam.pixelCopy');
         for (let y = 0; y < this.h; y++) {
             const seamCol = seam[y]; // Column to remove for this row
             newPixArray[y] = [];
             let newX = 0;
-            
+
             for (let x = 0; x < this.w; x++) {
                 if (x !== seamCol) {
                     newPixArray[y][newX] = this.pixArray[y][x];
@@ -152,7 +152,7 @@ export default class Picture {
         this.pixArray = newPixArray;
         this.w = this.w - 1;
         console.timeEnd('Picture.removeVerticalSeam.assignment');
-        
+
         console.timeEnd('Picture.removeVerticalSeam');
     }
 
@@ -189,7 +189,7 @@ export default class Picture {
         const canvas = document.createElement('canvas');
         canvas.width = this.w;
         canvas.height = this.h;
-        
+
         const ctx = canvas.getContext('2d');
         if (!ctx) {
             throw new Error('Failed to get canvas context');

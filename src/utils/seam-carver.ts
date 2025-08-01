@@ -1,5 +1,5 @@
-import Picture from './picture';
-import Color from './color';
+import Picture from './picture/picture';
+import Color from './picture/color';
 import EdgeWeightedDigraph from './graph/edge-weighted-digraph';
 import DirectedEdge from './graph/directed-edge';
 import FindShortestPath from './graph/find-shortest-path';
@@ -147,26 +147,26 @@ export class SeamCarver {
     // remove horizontal seam from current picture
     public removeHorizontalSeam(seam: number[]): void {
         console.time('removeHorizontalSeam');
-        
+
         if (seam.length !== this.width) {
             throw new Error('Invalid seam length for horizontal seam removal');
         }
-        
+
         this.#picture.removeHorizontalSeam(seam);
-        
+
         console.timeEnd('removeHorizontalSeam');
     }
 
     // remove vertical seam from current picture
     public removeVerticalSeam(seam: number[]): void {
         console.time('removeVerticalSeam');
-        
+
         if (seam.length !== this.height) {
             throw new Error('Invalid seam length for vertical seam removal');
         }
-        
+
         this.#picture.removeVerticalSeam(seam);
-        
+
         console.timeEnd('removeVerticalSeam');
     }
 
@@ -175,7 +175,7 @@ export class SeamCarver {
         if (seam.length !== this.width) {
             throw new Error('Invalid seam length for horizontal seam highlighting');
         }
-        
+
         this.#picture.highlightHorizontalSeam(seam);
     }
 
@@ -184,7 +184,7 @@ export class SeamCarver {
         if (seam.length !== this.height) {
             throw new Error('Invalid seam length for vertical seam highlighting');
         }
-        
+
         this.#picture.highlightVerticalSeam(seam);
     }
 
