@@ -7,7 +7,6 @@ import FindShortestPath from './graph/find-shortest-path';
 export class SeamCarver {
     #picture!: Picture;
 
-    // create a seam carver object based on the given picture
     constructor(picture: Picture) {
         if (!(picture instanceof Picture)) {
             throw new Error('Invalid picture object');
@@ -15,22 +14,27 @@ export class SeamCarver {
         this.#picture = picture.copy();
     }
 
-    // current picture
     get picture(): Picture {
         return this.#picture;
     }
 
-    // width of current picture
     get width(): number {
         return this.#picture.width;
     }
 
-    // height of current picture
     get height(): number {
         return this.#picture.height;
     }
 
-    // energy of pixel at column x and row y
+    /**
+     * Energy calculation is a measure of the importance of each pixel—the higher the energy, the less likely that the
+     * pixel will be included as part of a seam. This class implements the dual-gradient energy function. The energy is
+     * high for pixels in the image where there is a rapid color gradient (such as the boundary between two objects).
+     * The seam-carving technique avoids removing such high-energy pixels.
+     * @param x - The x-coordinate of the pixel.
+     * @param y - The y-coordinate of the pixel.
+     * @returns The energy of the pixel.
+     */
     public energy(x: number, y: number): number {
         if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
             throw new Error('Coordinates out of bounds');
@@ -54,7 +58,16 @@ export class SeamCarver {
         return rDiff * rDiff + gDiff * gDiff + bDiff * bDiff;
     }
 
-    // sequence of indices for horizontal seam
+    /**
+     * Seam identification. Find a horizontal seam of minimum total energy. This is similar to the classic shortest path
+     * problem in an edge-weighted digraph except for the following:
+     * - The weights are on the vertices instead of the edges.
+     * - We want to find the shortest path from any of the W pixels in the left most column to any of the W pixels in 
+     *   the right most column.
+     * - The digraph is acyclic, where there is a right edge from pixel (x, y) to pixels (x + 1, y - 1), (x + 1, y),
+     *   and (x + 1, y + 1), assuming that the coordinates are in the prescribed range.
+     * @returns sequence of indices for vertical seam
+     */
     public findHorizontalSeam(): number[] {
         const digraph = new EdgeWeightedDigraph(this.width * this.height + 2);
 
@@ -84,9 +97,6 @@ export class SeamCarver {
             }
         }
 
-        // Debugging printout graph structure
-        // console.log(digraph);
-
         const result = new Array(this.width).fill(0);
         let index = 0;
         const shortestPath = new FindShortestPath(digraph, sourceIndex).pathTo(targetIndex);
@@ -94,14 +104,21 @@ export class SeamCarver {
             if (edge.to === targetIndex) {
                 break;
             }
-            // result[index++] = edge.to % this.width;
             result[index++] = Math.floor(edge.to / this.width);
         }
 
         return result;
     }
 
-    // sequence of indices for vertical seam
+    /**
+     * Seam identification. Find a vertical seam of minimum total energy. This is similar to the classic shortest path
+     * problem in an edge-weighted digraph except for the following:
+     * - The weights are on the vertices instead of the edges.
+     * - We want to find the shortest path from any of the W pixels in the top row to any of the W pixels in the bottom.
+     * - The digraph is acyclic, where there is a downward edge from pixel (x, y) to pixels (x − 1, y + 1), (x, y + 1),
+     *   and (x + 1, y + 1), assuming that the coordinates are in the prescribed range.
+     * @returns sequence of indices for vertical seam
+     */
     public findVerticalSeam(): number[] {
         const digraph = new EdgeWeightedDigraph(this.width * this.height + 2);
 
@@ -144,7 +161,6 @@ export class SeamCarver {
         return result;
     }
 
-    // remove horizontal seam from current picture
     public removeHorizontalSeam(seam: number[]): void {
         console.time('removeHorizontalSeam');
 
@@ -157,7 +173,6 @@ export class SeamCarver {
         console.timeEnd('removeHorizontalSeam');
     }
 
-    // remove vertical seam from current picture
     public removeVerticalSeam(seam: number[]): void {
         console.time('removeVerticalSeam');
 
@@ -170,7 +185,6 @@ export class SeamCarver {
         console.timeEnd('removeVerticalSeam');
     }
 
-    // highlight horizontal seam by changing pixels to red for preview
     public highlightHorizontalSeam(seam: number[]): void {
         if (seam.length !== this.width) {
             throw new Error('Invalid seam length for horizontal seam highlighting');
@@ -179,7 +193,6 @@ export class SeamCarver {
         this.#picture.highlightHorizontalSeam(seam);
     }
 
-    // highlight vertical seam by changing pixels to red for preview
     public highlightVerticalSeam(seam: number[]): void {
         if (seam.length !== this.height) {
             throw new Error('Invalid seam length for vertical seam highlighting');
@@ -188,7 +201,9 @@ export class SeamCarver {
         this.#picture.highlightVerticalSeam(seam);
     }
 
-    // debug function to print energy matrix
+    /**
+     * Prints the energy matrix for debugging purposes.
+     */
     public debugPrintEnergyMatrix(): void {
         console.log('Energy Matrix:');
         for (let y = 0; y < this.height; y++) {
