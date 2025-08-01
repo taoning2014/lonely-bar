@@ -28,12 +28,21 @@
             <button class="toolbar__button" data-action="flip-vertical" title="Flip Vertical (V)">
                 <span class="fa fa-arrows-v" />
             </button>
-            <button class="toolbar__button" data-action="remove-horizontal-seam"
-                title="Remove Horizontal Seam (Ctrl+H)">
-                <span class="fa fa-magic" />
+            <button class="toolbar__button" 
+                :class="{ 'toolbar__button--disabled': isRemovingHorizontalSeam || isRemovingVerticalSeam }"
+                data-action="remove-horizontal-seam"
+                title="Remove Horizontal Seam (Ctrl+H)"
+                :disabled="isRemovingHorizontalSeam || isRemovingVerticalSeam">
+                <span v-if="isRemovingHorizontalSeam" class="fa fa-spinner fa-spin" />
+                <span v-else class="fa fa-magic" />
             </button>
-            <button class="toolbar__button" data-action="remove-vertical-seam" title="Remove Vertical Seam (Ctrl+V)">
-                <span class="fa fa-magnet" />
+            <button class="toolbar__button" 
+                :class="{ 'toolbar__button--disabled': isRemovingVerticalSeam || isRemovingHorizontalSeam }"
+                data-action="remove-vertical-seam" 
+                title="Remove Vertical Seam (Ctrl+V)"
+                :disabled="isRemovingVerticalSeam || isRemovingHorizontalSeam">
+                <span v-if="isRemovingVerticalSeam" class="fa fa-spinner fa-spin" />
+                <span v-else class="fa fa-magnet" />
             </button>
         </div>
     </div>
@@ -50,6 +59,8 @@ interface EditorData {
     croppedData: Cropper.Data | null;
     cropper: Cropper | null;
     onKeydown?: (e: KeyboardEvent) => void;
+    isRemovingHorizontalSeam: boolean;
+    isRemovingVerticalSeam: boolean;
 }
 
 export default {
@@ -74,6 +85,8 @@ export default {
             cropBoxData: null,
             croppedData: null,
             cropper: null,
+            isRemovingHorizontalSeam: false,
+            isRemovingVerticalSeam: false,
         };
     },
 
@@ -133,10 +146,14 @@ export default {
                     cropper.scaleY(-cropper.getData().scaleY || -1);
                     break;
                 case 'remove-horizontal-seam':
-                    removeHorizontalSeam(cropper);
+                    if (!this.isRemovingHorizontalSeam && !this.isRemovingVerticalSeam) {
+                        this.handleRemoveHorizontalSeam(cropper);
+                    }
                     break;
                 case 'remove-vertical-seam':
-                    removeVerticalSeam(cropper);
+                    if (!this.isRemovingVerticalSeam && !this.isRemovingHorizontalSeam) {
+                        this.handleRemoveVerticalSeam(cropper);
+                    }
                     break;
 
                 default:
@@ -237,7 +254,9 @@ export default {
                     if (e.ctrlKey) {
                         // Remove horizontal seam
                         e.preventDefault();
-                        removeHorizontalSeam(cropper);
+                        if (!this.isRemovingHorizontalSeam && !this.isRemovingVerticalSeam) {
+                            this.handleRemoveHorizontalSeam(cropper);
+                        }
                     } else {
                         // Flip horizontal
                         cropper.scaleX(-cropper.getData().scaleX || -1);
@@ -248,7 +267,9 @@ export default {
                     if (e.ctrlKey) {
                         // Remove vertical seam
                         e.preventDefault();
-                        removeVerticalSeam(cropper);
+                        if (!this.isRemovingVerticalSeam && !this.isRemovingHorizontalSeam) {
+                            this.handleRemoveVerticalSeam(cropper);
+                        }
                     } else {
                         // Flip vertical
                         cropper.scaleY(-cropper.getData().scaleY || -1);
@@ -371,6 +392,24 @@ export default {
         update(data: Partial<ImageData>) {
             Object.assign(this.data, data);
         },
+
+        async handleRemoveHorizontalSeam(cropper: Cropper) {
+            this.isRemovingHorizontalSeam = true;
+            try {
+                await removeHorizontalSeam(cropper);
+            } finally {
+                this.isRemovingHorizontalSeam = false;
+            }
+        },
+
+        async handleRemoveVerticalSeam(cropper: Cropper) {
+            this.isRemovingVerticalSeam = true;
+            try {
+                await removeVerticalSeam(cropper);
+            } finally {
+                this.isRemovingVerticalSeam = false;
+            }
+        },
     },
 };
 </script>
@@ -420,9 +459,18 @@ export default {
         outline: none;
     }
 
-    &:hover {
+    &:hover:not(.toolbar__button--disabled) {
         background-color: #0074d9;
         color: #fff;
+    }
+
+    &--disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        
+        &:hover {
+            background-color: transparent;
+        }
     }
 }
 </style>
