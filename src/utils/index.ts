@@ -2,52 +2,32 @@ import Cropper from 'cropperjs';
 import { SeamCarver } from './seam-carver';
 import Picture from './picture/picture';
 
-export function removeHorizontalSeam(cropper: Cropper) {
-    console.log('Removing horizontal seam');
+type SeamDirection = 'horizontal' | 'vertical';
 
-    // 1. Convert cropper's canvas to a Picture object
+function removeSeam(cropper: Cropper, direction: SeamDirection) {
     const canvas = cropper.getCroppedCanvas({ imageSmoothingEnabled: false });
     const picture = new Picture(canvas);
     const seamCarver = new SeamCarver(picture);
 
-    // 2. Find the horizontal seam
-    const horizontalSeam = seamCarver.findHorizontalSeam();
-    console.log('Horizontal seam:', horizontalSeam);
+    const seam = direction === 'horizontal'
+        ? seamCarver.findHorizontalSeam()
+        : seamCarver.findVerticalSeam();
 
-    // 3. Remove the horizontal seam from the Picture
-    seamCarver.highlightHorizontalSeam(horizontalSeam);
+    if (direction === 'horizontal') {
+        seamCarver.highlightHorizontalSeam(seam);
+    } else {
+        seamCarver.highlightVerticalSeam(seam);
+    }
 
-    // 4. Convert the modified picture back to canvas
     const modifiedCanvas = seamCarver.picture.toCanvas();
-
-    // 5. Update the cropper with the new image
     const dataURL = modifiedCanvas.toDataURL();
     cropper.replace(dataURL);
+}
 
-    console.log(`Removed horizontal seam. New dimensions: ${picture.width}x${picture.height}`);
+export function removeHorizontalSeam(cropper: Cropper) {
+    removeSeam(cropper, 'horizontal');
 }
 
 export function removeVerticalSeam(cropper: Cropper) {
-    console.log('Removing vertical seam');
-
-    // 1. Convert cropper's canvas to a Picture object
-    const canvas = cropper.getCroppedCanvas({ imageSmoothingEnabled: false });
-    const picture = new Picture(canvas);
-    const seamCarver = new SeamCarver(picture);
-
-    // 2. Find the vertical seam
-    const verticalSeam = seamCarver.findVerticalSeam();
-    console.log('Vertical seam:', verticalSeam);
-
-    // 3. Remove the vertical seam from the Picture
-    seamCarver.highlightVerticalSeam(verticalSeam);
-
-    // 4. Convert the modified picture back to canvas
-    const modifiedCanvas = seamCarver.picture.toCanvas();
-
-    // 5. Update the cropper with the new image
-    const dataURL = modifiedCanvas.toDataURL();
-    cropper.replace(dataURL);
-
-    console.log(`Removed vertical seam. New dimensions: ${picture.width}x${picture.height}`);
+    removeSeam(cropper, 'vertical');
 }
