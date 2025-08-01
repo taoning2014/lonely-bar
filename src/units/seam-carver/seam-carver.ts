@@ -12,12 +12,12 @@ export class SeamCarver {
         if (!(picture instanceof Picture)) {
             throw new Error('Invalid picture object');
         }
-        this.#picture = picture;
+        this.#picture = picture.copy();
     }
 
     // current picture
     get picture(): Picture {
-        return this.picture;
+        return this.#picture;
     }
 
     // width of current picture
@@ -146,20 +146,46 @@ export class SeamCarver {
 
     // remove horizontal seam from current picture
     public removeHorizontalSeam(seam: number[]): void {
+        console.time('removeHorizontalSeam');
+        
         if (seam.length !== this.width) {
             throw new Error('Invalid seam length for horizontal seam removal');
         }
         
         this.#picture.removeHorizontalSeam(seam);
+        
+        console.timeEnd('removeHorizontalSeam');
     }
 
     // remove vertical seam from current picture
     public removeVerticalSeam(seam: number[]): void {
+        console.time('removeVerticalSeam');
+        
         if (seam.length !== this.height) {
             throw new Error('Invalid seam length for vertical seam removal');
         }
         
         this.#picture.removeVerticalSeam(seam);
+        
+        console.timeEnd('removeVerticalSeam');
+    }
+
+    // highlight horizontal seam by changing pixels to red for preview
+    public highlightHorizontalSeam(seam: number[]): void {
+        if (seam.length !== this.width) {
+            throw new Error('Invalid seam length for horizontal seam highlighting');
+        }
+        
+        this.#picture.highlightHorizontalSeam(seam);
+    }
+
+    // highlight vertical seam by changing pixels to red for preview
+    public highlightVerticalSeam(seam: number[]): void {
+        if (seam.length !== this.height) {
+            throw new Error('Invalid seam length for vertical seam highlighting');
+        }
+        
+        this.#picture.highlightVerticalSeam(seam);
     }
 
     // debug function to print energy matrix
